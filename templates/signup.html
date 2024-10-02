@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crave Check</title>
+    <link rel="stylesheet" href="{{ url_for('send_static', path='assets/css/styles.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('send_static', path='assets/images/Logo.png') }}" type="image/x-icon">
+</head>
+<body>
+    <div class="header">
+        <!-- Login button -->
+        <form action="/Home" method="POST" class="login-button">
+            <button type="submit" class="button">Back</button>
+        </form>
+    
+        <!-- Back button -->
+        <form action="/login" method="POST" class="back-button">
+            <button type="submit" class="button">LogIn</button>
+        </form>
+    </div>
+      
+    <div class="form-container">
+        <h1>Sign up for Crave Check</h1>
+
+        <form id="signup-form" action="/signup" method="POST">
+            <!-- Name -->
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+        
+            <!-- Username -->
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+                <p id="username-error" style="color:red; display:none;">Username is already taken or contains invalid characters.</p>
+                <p id="username-length-error" style="color:red; display:none;">Username length should be above 5 characters.</p>
+            </div>
+        
+            <!-- Password -->
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+        
+            <!-- Age -->
+            <div class="form-group">
+                <label for="age">Age:</label>
+                <input type="number" id="age" name="age" required>
+            </div>
+        
+            <!-- Gender -->
+            <div class="form-group">
+                <label>Gender:</label>
+                <div class="genderoption-container">
+                    <div class="genderoption">
+                        <input type="radio" id="male" name="gender" value="Male" required>
+                        <label for="male">Male</label>
+                    </div>
+                    <div class="genderoption">
+                        <input type="radio" id="female" name="gender" value="Female" required>
+                        <label for="female">Female</label>
+                    </div>
+                </div>
+            </div>
+        
+            
+            <!-- Allergies -->
+            <div class="form-group">
+                <label>Select your Allergies:</label>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="gluten" name="allergies" value="Gluten">
+                    <label for="gluten">Gluten</label>
+                    
+                    <input type="checkbox" id="peanuts" name="allergies" value="Peanuts">
+                    <label for="peanuts">Peanuts</label>
+                    
+                    <input type="checkbox" id="treenuts" name="allergies" value="Tree Nuts">
+                    <label for="treenuts">Tree Nuts</label>
+                    
+                    <input type="checkbox" id="dairy" name="allergies" value="Dairy">
+                    <label for="dairy">Dairy</label>
+                    
+                    <input type="checkbox" id="eggs" name="allergies" value="Eggs">
+                    <label for="eggs">Eggs</label>
+                    
+                    <input type="checkbox" id="shellfish" name="allergies" value="Shellfish">
+                    <label for="shellfish">Shellfish</label>
+                    
+                    <input type="checkbox" id="fish" name="allergies" value="Fish">
+                    <label for="fish">Fish</label>
+                    
+                    <input type="checkbox" id="soy" name="allergies" value="Soy">
+                    <label for="soy">Soy</label>
+                    
+                    <input type="checkbox" id="wheat" name="allergies" value="Wheat">
+                    <label for="wheat">Wheat</label>
+                    
+                    <input type="checkbox" id="sesame" name="allergies" value="Sesame">
+                    <label for="sesame">Sesame</label>
+                </div>
+            </div>
+        
+            <!-- Dietary Restrictions -->
+            <div class="form-group">
+                <label for="dietary">Your Dietary Restrictions:</label>
+                <select id="dietary" name="dietary">
+                    <option value="Vegetarian" selected>Vegetarian</option>
+                    <option value="Non-Vegetarian">Non-Vegetarian</option>
+                    <option value="Vegan">Vegan</option>
+                    <option value="Lactose Intolerance">Lactose Intolerance</option>
+                    <option value="Gluten Sensitivity">Gluten Sensitivity</option>
+                </select>
+            </div>
+        
+            <!-- Health Conditions -->
+            <div class="form-group">
+                <label>Your Health Conditions:</label>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="diabetes" name="health_conditions" value="Diabetes">
+                    <label for="diabetes">Diabetes</label>
+                    
+                    <input type="checkbox" id="cholesterol" name="health_conditions" value="High Cholesterol">
+                    <label for="cholesterol">High Cholesterol</label>
+                    
+                    <input type="checkbox" id="heart" name="health_conditions" value="Heart Conditions">
+                    <label for="heart">Heart Conditions</label>
+                    
+                    <input type="checkbox" id="obesity" name="health_conditions" value="Obesity">
+                    <label for="obesity">Obesity</label>
+                    
+                    <input type="checkbox" id="kidney" name="health_conditions" value="Kidney Disease">
+                    <label for="kidney">Kidney Disease</label>
+                    
+                    <input type="checkbox" id="hypertension" name="health_conditions" value="Hypertension">
+                    <label for="hypertension">Hypertension</label>
+                </div>
+            </div>
+        
+            <!-- Religious Restrictions -->
+            <div class="form-group">
+                <label>Religious Restrictions:</label>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="jain" name="religious_restrictions" value="Jain">
+                    <label for="jain">Jain</label>
+                </div>
+            </div>
+        
+            <!-- Food Preferences -->
+            <div class="form-group">
+                <label>Food Preferences:</label>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="organic" name="food_preferences" value="Organic">
+                    <label for="organic">Organic</label>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div>
+                <input id="scan" type="submit" value="Sign Up" class="button">
+            </div>
+        </form>        
+    </div>
+
+    <script>
+        const existingUsernames = {{ username_available|safe }};
+        console.log(existingUsernames);
+        const usernameInput = document.getElementById('username');
+        const usernameError = document.getElementById('username-error');
+        const usernameLengthError = document.getElementById('username-length-error');
+        usernameInput.addEventListener('input', function () {
+            const username = usernameInput.value;
+            const hasSpecialChars = /[^a-zA-Z0-9]/.test(username);
+            const isTaken = existingUsernames.includes(username);
+            const isValidLength = username.length >= 5;
+            usernameError.style.display = (hasSpecialChars || isTaken) ? 'block' : 'none';
+            usernameLengthError.style.display = isValidLength ? 'none' : 'block';
+        });
+    
+        document.getElementById('signup-form').addEventListener('submit', function (event) {
+            event.preventDefault();
+            const confirmation = confirm("Are you sure you want to submit the form?");
+            if (confirmation) {
+                const form = document.getElementById('signup-form');
+                const formData = new FormData(form);
+                fetch('/check_username', {
+                    method: 'POST',
+                    body: formData,
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.exists) {
+                        usernameError.style.display = 'block';
+                    } else {
+                        usernameError.style.display = 'none';
+                        fetch('/signed_in', {
+                            method: 'POST',
+                            body: formData
+                        }).then(response => {
+                            if (response.ok) {
+                                window.location.href = '/signed_in'; 
+                            }
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+        });
+    
+        // Attach event listeners to all checkboxes
+        document.querySelectorAll('.checkbox-group input[type="checkbox"]').forEach(checkbox => {
+            const label = document.querySelector(`label[for="${checkbox.id}"]`);
+            label.addEventListener('click', function(event) {
+                event.preventDefault();
+                checkbox.checked = !checkbox.checked;
+                if (checkbox.checked) {
+                    console.log(`${checkbox.value} is selected`);
+                } else {
+                    console.log(`${checkbox.value} is unselected`);
+                }
+            });
+        });
+    </script>
+    
+</body>
+</html>

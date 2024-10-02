@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crave Check</title>
+    <link rel="stylesheet" href="{{ url_for('send_static', path='assets/css/styles.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('send_static', path='assets/images/Logo.png') }}" type="image/x-icon">
+</head>
+<body>
+
+    <div id="loadingOverlay" style="display: none;">
+        <div id="loadingModal">
+            <img src="{{ url_for('send_static', path='assets/images/loading.gif') }}" alt="Loading..." />
+            <div id="loadingText">Loading, please wait...</div>
+        </div>
+    </div>
+
+    {% if name %}
+        <p class="auth-message">Hi, {{ name }}</p>
+    {% else %}
+        <div class="auth-buttons">
+            <form action="/signup" method="POST">
+                <button type="submit" class="button">SignUp</button>
+            </form>
+            <form action="/login" method="POST">
+                <button type="submit" class="button">Login</button>
+            </form>
+        </div>
+    {% endif %}
+
+    <form action="/Home" method="POST">
+        <button type="submit" class="app_name">Crave Check</button>
+    </form>
+
+    <!-- Camera view and canvas -->
+    <div class="camera-container">
+        <video id="video" autoplay></video>
+        <canvas id="canvas" style="display:none;"></canvas>
+    </div>
+
+    <p class="text-below-camera">Scan one product at a time... Place the product at the center of the screen..</p>
+
+    <!-- Controls for snap and analyze -->
+    <div id="controls" style="margin-top: 10px;"> <!-- Reduced margin above buttons -->
+        <button id="snap">Snap Photo</button>
+        <button id="analyze" style="display:none;">Analyze</button>
+    </div>
+
+    <form id="analyzeForm" action="/analyze" method="POST" style="display:none;">
+        <input type="hidden" name="image" id="imageData">
+    </form>
+
+    <!-- Drag-and-drop / file upload section -->
+    <div id="upload-section">
+        <p>Drag & drop an image here, or <label for="fileInput">upload</label></p>
+        <input type="file" id="fileInput" accept="image/*">
+    </div>
+
+    {% if error_message %}
+        <div id="error-message" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(255, 0, 0, 0.8); color: white; padding: 15px; border-radius: 5px; z-index: var(--z-fixed);">
+            {{ error_message }}
+        </div>
+    {% endif %}
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const snap = document.getElementById('snap');
+        const analyze = document.getElementById('analyze');
+        const fileInput = document.getElementById('fileInput');
+        const context = canvas.getContext('2d');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        let stream = null;
+        const uploadSection = document.getElementById('upload-section');
+
+        function adjustCanvasSize() {
+            const controlsHeight = document.getElementById('controls').offsetHeight;
+            const uploadSectionHeight = document.getElementById('upload-section').offsetHeight;
+            const availableHeight = window.innerHeight - controlsHeight - uploadSectionHeight - 40; // Add padding
+
+            // Set canvas width to a percentage of the window's width
+            canvas.width = window.innerWidth * 0.9; 
+            canvas.height = availableHeight; // Max available height
+        }
+
+
+
+        adjustCanvasSize();
+
+        window.addEventListener('resize', adjustCanvasSize); // Adjust on window resize
+
+        function startCamera() {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(s => {
+                    stream = s;
+                    video.srcObject = stream;
+                })
+                .catch(error => {
+                    console.error("Error accessing the camera: ", error);
+                });
+        }
+
+        function stopCamera() {
+            if (stream) {
+                const tracks = stream.getTracks();
+                tracks.forEach(track => track.stop());
+            }
+            video.srcObject = null;
+        }
+
+        startCamera();
+
+        snap.addEventListener('click', function () {
+            if (snap.textContent === 'Snap Photo') {
+                // Get the video dimensions
+                const videoWidth = video.videoWidth;
+                const videoHeight = video.videoHeight;
+
+                // Set the canvas dimensions based on the video size to maintain aspect ratio
+                canvas.width = videoWidth; 
+                canvas.height = videoHeight; 
+
+                // Draw the image onto the canvas
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+                // Display the canvas and hide the video
+                canvas.style.display = 'block'; // Ensure the canvas is displayed
+                video.style.display = 'none';
+                stopCamera();
+                snap.textContent = 'Re-take ';
+                analyze.style.display = 'inline-block';
+            } else {
+                video.style.display = 'block';
+                canvas.style.display = 'none';
+                snap.textContent = 'Snap Photo';
+                analyze.style.display = 'none';
+                startCamera();
+            }
+        });
+
+        // Prevent default behavior for dragover and drop
+        uploadSection.addEventListener('dragover', function (e) {
+            e.preventDefault(); // Prevent the default to allow dropping
+            uploadSection.classList.add('dragging'); // Add a class to indicate the dragging state
+        });
+
+        uploadSection.addEventListener('dragleave', function (e) {
+            e.preventDefault();
+            uploadSection.classList.remove('dragging'); // Remove dragging class when leaving the area
+        });
+
+        uploadSection.addEventListener('drop', function (e) {
+            e.preventDefault();
+            uploadSection.classList.remove('dragging');
+            const files = e.dataTransfer.files; // Get the files from the drop event
+            if (files.length > 0) {
+                handleFileUpload(files[0]); // Use the first file for upload
+            }
+        });
+
+        function handleFileUpload(file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const img = new Image();
+                img.onload = function () {
+                    context.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+
+                // Set dimensions to fit the image within the canvas while maintaining aspect ratio
+                    let imgWidth = img.width;
+                    let imgHeight = img.height;
+
+                    const scaleWidth = canvas.width / imgWidth;
+                    const scaleHeight = canvas.height / imgHeight;
+                    const scale = Math.min(scaleWidth, scaleHeight); // Choose the smaller scale
+
+                    const newWidth = imgWidth * scale;
+                    const newHeight = imgHeight * scale;
+
+                    const x = (canvas.width - newWidth) / 2;
+                    const y = (canvas.height - newHeight) / 2;
+
+                    context.drawImage(img, x, y, newWidth, newHeight); // Draw the image
+
+                    canvas.style.display = 'block';
+                    video.style.display = 'none';
+                    stopCamera(); // Stop the camera when a file is uploaded
+                    snap.textContent = 'Re-take';
+                    analyze.style.display = 'inline-block';
+                };
+                img.src = e.target.result;
+            };
+
+            if (file) {
+                reader.readAsDataURL(file); // Read the image file
+            }
+        }
+
+        fileInput.addEventListener('change', (e) => {
+            handleFileUpload(e.target.files[0]);
+        });
+
+        analyze.addEventListener('click', function () {
+            const imageData = canvas.toDataURL('image/png');
+            document.getElementById('imageData').value = imageData; // Set image data in hidden input
+            loadingOverlay.style.display = 'flex'; // Show loading overlay
+            setTimeout(() => {
+                document.getElementById('analyzeForm').submit();
+            }, 100); // Delay form submission
+        });
+
+        // Display error message if it exists
+        {% if error_message %}
+            const errorMessageDiv = document.getElementById('error-message');
+            errorMessageDiv.style.display = 'block';
+            setTimeout(() => {
+                errorMessageDiv.style.display = 'none';
+            }, 3000); // Hide after 3 seconds
+        {% endif %}
+    </script>
+
+</body>
+</html>

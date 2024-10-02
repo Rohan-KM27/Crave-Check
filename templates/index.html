@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crave Check</title>
+    <link rel="stylesheet" href="{{ url_for('send_static', path='assets/css/styles.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('send_static', path='assets/images/Logo.png') }}" type="image/x-icon">
+
+    <style>
+        body {
+            background-image: url("{{ url_for('send_static', path='assets/images/background.gif') }}");
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+        @media (max-width: 768px) {
+            body {
+                background-size: 100% auto; 
+            }
+        }
+        @media (min-width: 769px) and (max-width: 1024px) {
+            body {
+                background-size: 100% 100%; 
+            }
+        }
+        @media (min-width: 1025px) {
+            body {
+                background-size: cover; 
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        {% if name %}
+            <p class="auth-message">Hi, {{ name }}</p>
+        {% else %}
+            <div class="auth-buttons">
+                <form action="/signup" method="POST">
+                    <button type="submit" class="button">SignUp</button>
+                </form>
+                <form action="/login" method="POST">
+                    <button type="submit" class="button">Login</button>
+                </form>
+            </div>
+        {% endif %}
+        <h1 class="app-name">Crave Check</h1>
+
+        <div class="camera">
+            <form action="/Image_process" method="post">
+                <button type="submit" id="scan" class="button camera-button">
+                    <img src="{{ url_for('send_static', path='assets/images/camera-icon.png') }}" alt="Camera Icon">
+                </button>
+            </form>
+        </div>
+        {% if name %}
+            <p class="quote">Check all the products before adding in your Cart</p>
+        {% else %}
+            <p class="quote">Sign in to get personalized results</p>
+        {% endif %}
+    </div>
+    <script src="{{ url_for('send_static', path='assets/js/main.js') }}"></script>
+</body>
+
+</html>
