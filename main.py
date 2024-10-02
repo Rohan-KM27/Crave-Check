@@ -8,7 +8,15 @@ from functions import *
 import io
 import google.generativeai as genai
 
-genai.configure(api_key='AIzaSyCoNoMi0F_0J5-AJJoqX2RABUIHLerlOtM')
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
+genai.configure(api_key=os.getenv('api_key'))
+
+
 model = genai.GenerativeModel("gemini-1.5-flash")
 cred = credentials.Certificate('Credentials.json')
 firebase_admin.initialize_app(cred, {
