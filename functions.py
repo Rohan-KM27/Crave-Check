@@ -6,8 +6,13 @@ from PIL import Image
 import re
 import google.generativeai as genai
 from tabulate import tabulate
+import os
+from dotenv import load_dotenv
 
-genai.configure(api_key='AIzaSyCoNoMi0F_0J5-AJJoqX2RABUIHLerlOtM')
+# Load environment variables from .env file
+load_dotenv()
+
+genai.configure(api_key=os.getenv('api_key'))
 model = genai.GenerativeModel("gemini-1.5-flash")
 
 
